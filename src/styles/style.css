@@ -1,3 +1,7 @@
 .display-none {
     display: none;
 }
+
+.specialty-register-container,  .patient-register-container {
+    border: 1px solid black;
+}

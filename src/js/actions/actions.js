@@ -7,6 +7,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+export function getAllCompleteSpecialties() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const response = yield fetch('http://localhost:8080/api/saintclaire/get/all/specialties');
+        const data = yield response.json();
+        return data;
+    });
+}
 export function postSpecialty(specialty) {
     return __awaiter(this, void 0, void 0, function* () {
         const response = yield fetch('http://localhost:8080/api/saintclaire/create/specialty', {
