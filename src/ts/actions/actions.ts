@@ -1,6 +1,6 @@
-import {specialtyReqI} from "../index.js"
+import {specialtyInboundI} from "../index.js"
 
-export async function postSpecialty(specialty:specialtyReqI){
+export async function postSpecialty(specialty:specialtyInboundI){
     const response:Response = await fetch('http://localhost:8080/api/saintclaire/create/specialty', 
     {
       method: 'POST',
