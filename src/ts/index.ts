@@ -7,6 +7,12 @@ const createSpecialtyBtn: HTMLButtonElement | null = document.querySelector('#cr
 const mainMenu: HTMLDivElement | null = document.querySelector('.main-menu');
 const cancelBtn: HTMLButtonElement | null = document.querySelector('#cancel-btn');
 const showAllDataBtn: HTMLButtonElement | null = document.querySelector('#show-all-data');
+const registerAppointmentBtn: HTMLButtonElement | null = document.querySelector('#register-appointment-btn');
+const initialPatientValidationForm: HTMLFormElement | null = document.querySelector('.initial-patient-validation-form');
+
+
+//STATE
+let fullState:completeOutboundI[] = [];
 
 
 //INTERFACES
@@ -20,7 +26,7 @@ export interface completeOutboundI {
     specialtyName: string,
     physicianInCharge: string,
         patientList: [{
-            patientId: number,
+            patientDNI: number,
             patientName: string,
             age: number,
             appointmentDates: string,
@@ -36,16 +42,28 @@ specialtyCreationform?.addEventListener('submit', (e) => createSpecialty(e));
 createSpecialtyBtn?.addEventListener('click', () => displaySpecialtyCreation());
 cancelBtn?.addEventListener('click', () => cancelAllDisplay());
 showAllDataBtn?.addEventListener('click', () => displayShowAllData());
+registerAppointmentBtn?.addEventListener('click', () => displayAppointmentRegistration());
+initialPatientValidationForm?.addEventListener('submit', (e) => validateUserInSatate(e));
 
 
 
 
 
 //DISPLAY MENU FUNCTIONS
+function displayAppointmentRegistration(){
+    const patientIdInput = document.querySelector('#patientDNI') as HTMLInputElement;
+    patientIdInput.value = '';
+    mainMenu?.classList.add('display-none');
+    initialPatientValidationForm?.classList.remove('display-none');
+    cancelBtn?.classList.remove('display-none');
+}
+
+
 function displayShowAllData(){
     mainMenu?.classList.add('display-none');
     cancelBtn?.classList.remove('display-none');
     getAllCompleteSpecialties().then(specialties => {
+        fullState = specialties;
         const displayContentDiv = document.querySelector('.display-content') as HTMLDivElement;
         const div:HTMLDivElement = document.createElement('div');
         div.className = "specialties-container";
@@ -66,7 +84,7 @@ function cancelAllDisplay(){
     if(divAllData !== null){
         divAllData.remove();
     }
-
+    initialPatientValidationForm?.classList.add('display-none');
 }
 
 function displaySpecialtyCreation(){
@@ -81,9 +99,72 @@ function displaySpecialtyCreation(){
 
 
 //FUNCTIONS
+function validateUserInSatate(e:SubmitEvent){
+    e.preventDefault();
+    const isNaNMessage = document.querySelector('.p-message') as HTMLParagraphElement;
+    isNaNMessage?.remove();
+    const patientDNIInput = document.querySelector('#patientDNI') as HTMLInputElement;
+    let inputValue: any = patientDNIInput.value;
+    // if(isNaN(inputValue)){
+    //     const pMessage = document.createElement('p');
+    //     pMessage.className = 'p-message';
+    //     pMessage.innerText = 'The DNI must be a number';
+    //     const displayContentDiv = document.querySelector('.display-content') as HTMLDivElement;
+    //     displayContentDiv.append(pMessage);
+    // } else {
+        // let found:boolean = false;
+
+
+        // let patient = fullState.map((nestedObject.nestedObject) => {
+        //     if(typeof nestedObject.nestedObject !=)
+        // })
+
+
+
+        // let patient = fullState.map(specialty => specialty.patientList)
+        //                         .map(patientListing => patientListing.value);
+
+        // console.log(patient);
+
+        // for(let val in fullState){
+        //     if(isObject(fullState[val])){
+        //         for(let val2 in fullState[val]){
+        //             console.log(val2);
+        //         }
+        //     }
+        // }
+
+        // puedo combinar map para extraer y filter
+        // revisar find que no estaba en el video
+
+
+
+
+
+        // if(patient !== null){
+        //     console.log('found');
+            // si lo encontró mostrar para que seleccione specialty
+            // habrá que validar que no esté en el specialty el paciente
+            //si está aumentar todo pero no agregar paciente
+        // } else {
+        //     console.log('Not found');
+        //     patientIdInput.value = "";
+        //     initialPatientValidationForm?.classList.add('display-none');
+        //     const patientRegistrationForm: HTMLFormElement | null = document.querySelector('.patient-registration-form');
+        //     patientRegistrationForm?.classList.remove('display-none');
+
+        // }
+        
+
+
+        // si no lo encontró mostrar para que se registe también con el specialty
+    // }
+}
+
+
+
 
 function createSpecialtyListing(specialty:completeOutboundI): HTMLDivElement{
-    
     const div:HTMLDivElement = document.createElement('div');
     div.className = 'specialty-register-container';
     div.classList.add(`specialty-${specialty.specialtyId}`);
@@ -103,8 +184,8 @@ function createSpecialtyListing(specialty:completeOutboundI): HTMLDivElement{
         const singlePatientDiv:HTMLElement = document.createElement('div');
         singlePatientDiv.className = 'patient-register-container';
 
-        const patientIdh4:HTMLElement = document.createElement('h4');
-        patientIdh4.innerText = 'Patient ID: ' + patient.patientId;
+        const patientDNIh4:HTMLElement = document.createElement('h4');
+        patientDNIh4.innerText = 'Patient DNI: ' + patient.patientDNI;
         const patientNameh4:HTMLElement = document.createElement('h4');
         patientNameh4.innerText = 'Patient Name: ' + patient.patientName;
         const ageh4:HTMLElement = document.createElement('h4');
@@ -116,7 +197,7 @@ function createSpecialtyListing(specialty:completeOutboundI): HTMLDivElement{
         const fkSpecialtyIdh4:HTMLElement = document.createElement('h4');
         fkSpecialtyIdh4.innerText = 'Specialty ID: ' + patient.fkSpecialtyId;
 
-        singlePatientDiv.append(patientIdh4, patientNameh4, ageh4, appointmentDatesh4, numberOfAppointmentsh4, fkSpecialtyIdh4);
+        singlePatientDiv.append(patientDNIh4, patientNameh4, ageh4, appointmentDatesh4, numberOfAppointmentsh4, fkSpecialtyIdh4);
 
         div.append(singlePatientDiv);
 
@@ -157,4 +238,12 @@ function createSpecialty(e:SubmitEvent){
     mainMenu?.classList.remove('display-none');
     cancelBtn?.classList.add('display-none');
 
+}
+
+
+function isObject(val:any){
+    if(val === null){
+        return false;
+    }
+    return (typeof val === 'object');
 }

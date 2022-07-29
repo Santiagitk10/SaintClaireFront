@@ -13,10 +13,13 @@
         <button id="cancel-btn" class="display-none">Cancel</button>
         <div class="main-menu">
             <button id="create-specialty-btn">Create Specialty</button>
-            <button id="show-all-data">Show All Data</button>
 
             <!-- Si no está el usuario debe dar las opciones para el registro del paciente -->
-            <button>Register Appointment</button> 
+            <button id="register-appointment-btn">Register Appointment</button> 
+
+            <button id="show-all-data">Show All Data</button>
+
+            
 
             <button>Show Patients</button>
             <button>Edit Specialty</button>
@@ -26,6 +29,8 @@
         </div>
 
         <div class="display-content">
+
+            <!-- FORM FOR SPECIALTY CREATION -->
             <form class="specialty-creation-form display-none" action="#">
                 <fieldset>
                     <legend>Create Specialty</legend>
@@ -36,6 +41,40 @@
                     <button>Submit</button>
                 </fieldset>
             </form>
+
+            <!-- FORM FOR PATIENT VALIDATION IN STATE -->
+
+            <form class="initial-patient-validation-form display-none" action="#">
+                <fieldset>
+                    <legend>Register Appointment</legend>
+                    <label for="patientDNI">Patient DNI</label>
+                    <input id="patientDNI" type="text" required>
+                    <button>Submit</button>
+                </fieldset>
+            </form>
+
+            <!-- FORM FOR PATIENT REGISTRATION -->
+
+            <form class="patient-registration-form display-none" action="#">
+                <fieldset>
+                    <legend>Patient Data</legend>
+                    <label for="patiendName">Patient Name</label>
+                    <input id="patiendName" type="text" required>
+
+                    <label for="patiendAge">Patient Age</label>
+                    <input id="patiendAge" type="number" min="1">
+
+                    <p>Select a Specialty</p>
+                    <select name="specialty" id="specialtySelection">
+
+                    </select>
+
+                    <button>Submit</button>
+                </fieldset>
+            </form>
+
+
+
         </div>
     </div>
     
