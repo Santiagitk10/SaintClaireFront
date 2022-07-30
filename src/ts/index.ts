@@ -1,4 +1,4 @@
-import { postSpecialty, getAllCompleteSpecialties, getToValidatePatient, postPatient } from "./actions/actions.js";
+import { postSpecialty, getAllCompleteSpecialties, getToValidatePatient, postPatient, getAllPatients } from "./actions/actions.js";
 
 
 //GLOBAL ELEMENTS SELECTION
@@ -10,6 +10,7 @@ const showAllDataBtn: HTMLButtonElement | null = document.querySelector('#show-a
 const registerAppointmentBtn: HTMLButtonElement | null = document.querySelector('#register-appointment-btn');
 const patientRegistrationForm: HTMLFormElement | null = document.querySelector('.patient-registration-form');
 const specialtySelectionSelect = document.querySelector('#specialtySelection') as HTMLSelectElement;
+const showPatientsBtn = document.querySelector('#show-patients');
 
 
 //STATE
@@ -44,6 +45,17 @@ export interface patientInboundI {
 }
 
 
+export interface patientOutboundI {
+    patientId: number,
+    patientDNI: number,
+    patientName: string,
+    age: number,
+    appointmentDates: string,
+    numberOfAppointments: number
+}
+
+
+
 
 //EVENT LISTENERS
 specialtyCreationform?.addEventListener('submit', (e) => createSpecialty(e));
@@ -52,6 +64,7 @@ cancelBtn?.addEventListener('click', () => cancelAllDisplay());
 showAllDataBtn?.addEventListener('click', () => displayShowAllData());
 registerAppointmentBtn?.addEventListener('click', () => displayAppointmentRegistration());
 patientRegistrationForm?.addEventListener('submit', (e) => validateUserInDB(e));
+showPatientsBtn?.addEventListener('click', () => renderPatients());
 
 
 
@@ -132,6 +145,75 @@ function displaySpecialtyCreation(){
 
 
 //FUNCTIONS
+function renderPatients(){
+    getAllPatients().then(patients => {
+        const displayContentDiv = document.querySelector('.display-content') as HTMLDivElement;
+        const div:HTMLDivElement = document.createElement('div');
+        div.className = "patients-container";
+        patients.forEach(patient => {
+           div.append(renderSinglePatient(patient));
+        });
+        displayContentDiv.append(div);
+    })
+}
+
+
+function renderSinglePatient(patient:patientOutboundI): HTMLDivElement{
+    const div:HTMLDivElement = document.createElement('div');
+    div.className = 'single-patient-container';
+    div.classList.add(`patient-${patient.patientId}`);
+
+    const patientIdh3: HTMLElement = document.createElement('h3');
+    patientIdh3.innerText = patient.patientId.toString();
+    const patientDNIh3: HTMLElement = document.createElement('h3');
+    patientDNIh3.innerText = patient.patientDNI.toString();
+    const patientNameh3: HTMLElement = document.createElement('h3');
+    patientNameh3.innerText = patient.patientName;
+    const patientAgeh3: HTMLElement = document.createElement('h3');
+    patientAgeh3.innerText = patient.age.toString();
+    const appointmentDatesh3: HTMLElement = document.createElement('h3');
+    appointmentDatesh3.innerText = patient.appointmentDates;
+    const nummberOfAppointmentsh3: HTMLElement = document.createElement('h3');
+    nummberOfAppointmentsh3.innerText = patient.numberOfAppointments.toString();
+
+    const addSpecialtyBtn: HTMLButtonElement = document.createElement('button');
+    addSpecialtyBtn.className = 'single-patient-appointment-button';
+    addSpecialtyBtn.innerText = 'Add Appointment';
+    addSpecialtyBtn.addEventListener('click', ()=> handleAppointmentAddition());
+
+    const editPatientBtn: HTMLButtonElement = document.createElement('button');
+    editPatientBtn.className = 'single-patient-edit-button';
+    editPatientBtn.innerText = 'Edit';
+    editPatientBtn.addEventListener('click', ()=> handlePatientEdition());
+
+    const deletePatientBtn: HTMLButtonElement = document.createElement('button');
+    deletePatientBtn.className = 'single-patient-delete-button';
+    deletePatientBtn.innerText = 'Delete';
+    deletePatientBtn.addEventListener('click', ()=> handlePatienteDeletion());
+
+    div.append(patientIdh3, patientDNIh3, patientNameh3, patientAgeh3,  appointmentDatesh3, nummberOfAppointmentsh3,
+        addSpecialtyBtn, editPatientBtn, deletePatientBtn);
+
+    return div;
+
+}
+
+function handleAppointmentAddition(){
+
+}
+
+
+function handlePatientEdition(){
+
+}
+
+
+function handlePatienteDeletion(){
+    
+}
+
+
+
 function validateUserInDB(e:SubmitEvent){
     e.preventDefault();
     const patientDNIInput = document.querySelector('#patientDNI') as HTMLInputElement;

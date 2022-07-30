@@ -14,6 +14,13 @@ export function getAllCompleteSpecialties() {
         return data;
     });
 }
+export function getAllPatients() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const response = yield fetch('http://localhost:8080/api/saintclaire/get/all/patients');
+        const data = yield response.json();
+        return data;
+    });
+}
 export function getToValidatePatient(patientDNI) {
     return __awaiter(this, void 0, void 0, function* () {
         const response = yield fetch(`http://localhost:8080/api/saintclaire/validate/patient/${patientDNI}`);

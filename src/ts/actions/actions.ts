@@ -1,4 +1,4 @@
-import {specialtyInboundI, completeOutboundI, patientInboundI} from "../index.js"
+import {specialtyInboundI, completeOutboundI, patientInboundI, patientOutboundI} from "../index.js"
 
 
 export async function getAllCompleteSpecialties(){
@@ -7,6 +7,12 @@ export async function getAllCompleteSpecialties(){
   return data;
 }
 
+
+export async function getAllPatients(){
+  const response:Response = await fetch('http://localhost:8080/api/saintclaire/get/all/patients');
+  const data:patientOutboundI[] = await response.json();
+  return data;
+}
 
 
 export async function getToValidatePatient(patientDNI: number){
