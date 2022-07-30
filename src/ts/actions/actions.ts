@@ -1,4 +1,4 @@
-import {specialtyInboundI, completeOutboundI} from "../index.js"
+import {specialtyInboundI, completeOutboundI, patientInboundI} from "../index.js"
 
 
 export async function getAllCompleteSpecialties(){
@@ -6,6 +6,15 @@ export async function getAllCompleteSpecialties(){
   const data:completeOutboundI[] = await response.json();
   return data;
 }
+
+
+
+export async function getToValidatePatient(patientDNI: number){
+    const response:Response = await fetch(`http://localhost:8080/api/saintclaire/validate/patient/${patientDNI}`)
+    const data:Boolean  = await response.json();
+    return data;
+}
+
 
 
 export async function postSpecialty(specialty:specialtyInboundI){
@@ -19,4 +28,16 @@ export async function postSpecialty(specialty:specialtyInboundI){
     })
   
     return response;
-  }
+}
+
+export async function postPatient(patient:patientInboundI){
+    const response:Response = await fetch('http://localhost:8080/api/saintclaire/create/patient',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(patient)
+    })
+    return response;
+}

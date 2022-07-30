@@ -1,4 +1,4 @@
-import { postSpecialty, getAllCompleteSpecialties } from "./actions/actions.js";
+import { postSpecialty, getAllCompleteSpecialties, getToValidatePatient, postPatient } from "./actions/actions.js";
 
 
 //GLOBAL ELEMENTS SELECTION
@@ -35,6 +35,13 @@ export interface completeOutboundI {
         }]
 }
 
+export interface patientInboundI {
+    patientDNI: number,
+    patientName: string,
+    age: number,
+    fkSpecialtyId: number
+}
+
 
 
 //EVENT LISTENERS
@@ -43,7 +50,7 @@ createSpecialtyBtn?.addEventListener('click', () => displaySpecialtyCreation());
 cancelBtn?.addEventListener('click', () => cancelAllDisplay());
 showAllDataBtn?.addEventListener('click', () => displayShowAllData());
 registerAppointmentBtn?.addEventListener('click', () => displayAppointmentRegistration());
-initialPatientValidationForm?.addEventListener('submit', (e) => validateUserInSatate(e));
+initialPatientValidationForm?.addEventListener('submit', (e) => validateUserInDB(e));
 
 
 
@@ -51,18 +58,38 @@ initialPatientValidationForm?.addEventListener('submit', (e) => validateUserInSa
 
 //DISPLAY MENU FUNCTIONS
 function displayAppointmentRegistration(){
-    const patientIdInput = document.querySelector('#patientDNI') as HTMLInputElement;
-    patientIdInput.value = '';
-    mainMenu?.classList.add('display-none');
-    initialPatientValidationForm?.classList.remove('display-none');
-    cancelBtn?.classList.remove('display-none');
+    getAllCompleteSpecialties().then(specialties => {
+        if(specialties.length === 0){
+            const displayContentDiv = document.querySelector('.display-content') as HTMLDivElement;
+            const noSpecialtiesMessageP = document.createElement('p') as HTMLParagraphElement;
+            noSpecialtiesMessageP.innerText = "At least 1 Specialty must be created before Registering an Appointment";
+            displayContentDiv.append(noSpecialtiesMessageP);
+            setInterval(function(){
+                noSpecialtiesMessageP.remove();
+            },3000);
+            return;
+        } else {
+            mainMenu?.classList.add('display-none');
+            initialPatientValidationForm?.classList.remove('display-none');
+            const patientIdInput = document.querySelector('#patientDNI') as HTMLInputElement;
+            patientIdInput.value = '';
+            cancelBtn?.classList.remove('display-none');
+        }
+    })
+    
 }
+
+
+
+
+
 
 
 function displayShowAllData(){
     mainMenu?.classList.add('display-none');
     cancelBtn?.classList.remove('display-none');
     getAllCompleteSpecialties().then(specialties => {
+        //TODO Revisar si si necesito el state porque creo que mejor estoy leyento todo dela base datos
         fullState = specialties;
         const displayContentDiv = document.querySelector('.display-content') as HTMLDivElement;
         const div:HTMLDivElement = document.createElement('div');
@@ -85,6 +112,8 @@ function cancelAllDisplay(){
         divAllData.remove();
     }
     initialPatientValidationForm?.classList.add('display-none');
+    const patientRegistrationForm: HTMLFormElement | null = document.querySelector('.patient-registration-form');
+    patientRegistrationForm?.classList.add('display-none');
 }
 
 function displaySpecialtyCreation(){
@@ -99,69 +128,85 @@ function displaySpecialtyCreation(){
 
 
 //FUNCTIONS
-function validateUserInSatate(e:SubmitEvent){
+function validateUserInDB(e:SubmitEvent){
     e.preventDefault();
     const isNaNMessage = document.querySelector('.p-message') as HTMLParagraphElement;
     isNaNMessage?.remove();
     const patientDNIInput = document.querySelector('#patientDNI') as HTMLInputElement;
-    let inputValue: any = patientDNIInput.value;
-    // if(isNaN(inputValue)){
-    //     const pMessage = document.createElement('p');
-    //     pMessage.className = 'p-message';
-    //     pMessage.innerText = 'The DNI must be a number';
-    //     const displayContentDiv = document.querySelector('.display-content') as HTMLDivElement;
-    //     displayContentDiv.append(pMessage);
-    // } else {
-        // let found:boolean = false;
+    let inputValue: number = parseInt(patientDNIInput.value); 
+    if(isNaN(inputValue)){
+        const pMessage = document.createElement('p');
+        pMessage.className = 'p-message';
+        pMessage.innerText = 'The DNI must be a number';
+        const displayContentDiv = document.querySelector('.display-content') as HTMLDivElement;
+        displayContentDiv.append(pMessage);
+    } else {
+
+        getToValidatePatient(inputValue).then(isDNIPresent => {
+            if(isDNIPresent){
+                //     si lo encontró mostrar para que seleccione specialty
+                //     habrá que validar que no esté en el specialty el paciente
+                //     si está aumentar todo pero no agregar paciente
+            } else {
+                patientDNIInput.value = ""; //OJO CON ESTE
+                initialPatientValidationForm?.classList.add('display-none');
+                cancelBtn?.classList.remove('display-none');
+                const patientRegistrationForm: HTMLFormElement | null = document.querySelector('.patient-registration-form');
+                patientRegistrationForm?.classList.remove('display-none');
+                const specialtySelectionSelect = document.querySelector('#specialtySelection') as HTMLSelectElement;
+                setSpecialtySelectMenu(specialtySelectionSelect);
+                patientRegistrationForm?.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const patientNameInput = document.querySelector('#patientName') as HTMLInputElement;
+                    const patientAgeInput = document.querySelector('#patientAge') as HTMLInputElement;
+                    const newPatient: patientInboundI = {
+                        patientDNI: inputValue,
+                        patientName: patientNameInput.value,
+                        age: parseInt(patientAgeInput.value),
+                        fkSpecialtyId: parseInt(specialtySelectionSelect.value)
+                    }
+
+                    console.log(newPatient);
+
+                    postPatient(newPatient).then(
+                        response => {
+                            if(response.status === 200){
+                                console.log("Post Ok");
+                            } else {
+                                console.log("The request failed");
+                            }
+                        }
+                    )
+                    patientDNIInput.value = "";//Revisar
+                    patientNameInput.value = "";
+                    patientAgeInput.value = "";
+                    patientRegistrationForm?.classList.add('display-none');
+
+                    
 
 
-        // let patient = fullState.map((nestedObject.nestedObject) => {
-        //     if(typeof nestedObject.nestedObject !=)
-        // })
 
-
-
-        // let patient = fullState.map(specialty => specialty.patientList)
-        //                         .map(patientListing => patientListing.value);
-
-        // console.log(patient);
-
-        // for(let val in fullState){
-        //     if(isObject(fullState[val])){
-        //         for(let val2 in fullState[val]){
-        //             console.log(val2);
-        //         }
-        //     }
-        // }
-
-        // puedo combinar map para extraer y filter
-        // revisar find que no estaba en el video
-
-
-
-
-
-        // if(patient !== null){
-        //     console.log('found');
-            // si lo encontró mostrar para que seleccione specialty
-            // habrá que validar que no esté en el specialty el paciente
-            //si está aumentar todo pero no agregar paciente
-        // } else {
-        //     console.log('Not found');
-        //     patientIdInput.value = "";
-        //     initialPatientValidationForm?.classList.add('display-none');
-        //     const patientRegistrationForm: HTMLFormElement | null = document.querySelector('.patient-registration-form');
-        //     patientRegistrationForm?.classList.remove('display-none');
-
-        // }
-        
-
-
-        // si no lo encontró mostrar para que se registe también con el specialty
-    // }
+                });
+            }
+        })
+    }
 }
 
 
+
+
+
+function setSpecialtySelectMenu(select:HTMLSelectElement){
+    getAllCompleteSpecialties().then(specialties => {
+        let specialtiesDisplay = specialties.map(specialty => specialty.specialtyId + ". " + specialty.specialtyName);
+        specialtiesDisplay.forEach(specialtyToDisplay => {
+            const optionElement = document.createElement('option') as HTMLOptionElement;
+            optionElement.innerText = specialtyToDisplay;
+            optionElement.value = specialtyToDisplay.split(".")[0];
+            select.append(optionElement);
+        });
+    })
+}
 
 
 function createSpecialtyListing(specialty:completeOutboundI): HTMLDivElement{
@@ -240,10 +285,3 @@ function createSpecialty(e:SubmitEvent){
 
 }
 
-
-function isObject(val:any){
-    if(val === null){
-        return false;
-    }
-    return (typeof val === 'object');
-}

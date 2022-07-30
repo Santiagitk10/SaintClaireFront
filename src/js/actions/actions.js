@@ -14,6 +14,13 @@ export function getAllCompleteSpecialties() {
         return data;
     });
 }
+export function getToValidatePatient(patientDNI) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const response = yield fetch(`http://localhost:8080/api/saintclaire/validate/patient/${patientDNI}`);
+        const data = yield response.json();
+        return data;
+    });
+}
 export function postSpecialty(specialty) {
     return __awaiter(this, void 0, void 0, function* () {
         const response = yield fetch('http://localhost:8080/api/saintclaire/create/specialty', {
@@ -22,6 +29,18 @@ export function postSpecialty(specialty) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(specialty)
+        });
+        return response;
+    });
+}
+export function postPatient(patient) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const response = yield fetch('http://localhost:8080/api/saintclaire/create/patient', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(patient)
         });
         return response;
     });
