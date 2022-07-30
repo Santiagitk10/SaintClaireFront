@@ -22,6 +22,12 @@ export async function getToValidatePatient(patientDNI: number){
 }
 
 
+export async function getToValidateSpecialty(spacialtyName: string){
+  const response:Response = await fetch(`http://localhost:8080/api/saintclaire/validate/specialty/${spacialtyName}`)
+  const data:Boolean  = await response.json();
+  return data;
+}
+
 
 export async function postSpecialty(specialty:specialtyInboundI){
     const response:Response = await fetch('http://localhost:8080/api/saintclaire/create/specialty', 
@@ -62,6 +68,15 @@ export async function putOnlyAppintmentInfo(patientDNI:number){
 
 export async function deletePatient(patientId:number){
   const response:Response = await fetch(`http://localhost:8080/api/saintclaire/delete/patient/${patientId}`, 
+  {
+    method: 'DELETE'
+  })
+
+  return response;
+}
+
+export async function deleteSpecialty(specialtyId:number){
+  const response:Response = await fetch(`http://localhost:8080/api/saintclaire/delete/specialty/${specialtyId}`, 
   {
     method: 'DELETE'
   })

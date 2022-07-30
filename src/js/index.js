@@ -1,4 +1,4 @@
-import { postSpecialty, getAllCompleteSpecialties, getToValidatePatient, postPatient, getAllPatients, putOnlyAppintmentInfo, deletePatient } from "./actions/actions.js";
+import { postSpecialty, getAllCompleteSpecialties, getToValidatePatient, postPatient, getAllPatients, putOnlyAppintmentInfo, deletePatient, deleteSpecialty, getToValidateSpecialty } from "./actions/actions.js";
 //GLOBAL ELEMENTS SELECTION
 const specialtyCreationform = document.querySelector('.specialty-creation-form');
 const createSpecialtyBtn = document.querySelector('#create-specialty-btn');
@@ -232,7 +232,7 @@ function createSpecialtyListing(specialty) {
     const deleteSpecialtyBtn = document.createElement('button');
     deleteSpecialtyBtn.className = 'specialty-delete-button';
     deleteSpecialtyBtn.innerText = 'Delete';
-    deleteSpecialtyBtn.addEventListener('click', () => handleSpecialtyDelete());
+    deleteSpecialtyBtn.addEventListener('click', () => handleSpecialtyDelete(div));
     div.append(h2, h3, h4, editSpecialtyBtn, deleteSpecialtyBtn);
     specialty.patientList.forEach(patient => {
         const singlePatientDiv = document.createElement('div');
@@ -257,27 +257,52 @@ function createSpecialtyListing(specialty) {
 }
 function hanldeSpecialtyEdit() {
 }
-function handleSpecialtyDelete() {
+function handleSpecialtyDelete(div) {
+    const specialtyId = parseInt(div.classList[1].split('-')[1]);
+    getAllCompleteSpecialties().then(specialties => {
+        let specialty = specialties.find(specialty => specialty.specialtyId === specialtyId);
+        console.log();
+        if ((specialty === null || specialty === void 0 ? void 0 : specialty.patientList[0]) === undefined) {
+            deleteSpecialty(specialtyId);
+        }
+        else {
+            alert('Cannot be deleted. Delete ALL Patients inside the Specialty to proceed');
+        }
+        mainMenu === null || mainMenu === void 0 ? void 0 : mainMenu.classList.remove('display-none');
+        cancelBtn === null || cancelBtn === void 0 ? void 0 : cancelBtn.classList.add('display-none');
+        const divAllData = document.querySelector('.specialties-container');
+        if (divAllData !== null) {
+            divAllData.remove();
+        }
+    });
 }
 function createSpecialty(e) {
     e.preventDefault();
     const specialtyNameInput = document.querySelector('#SpecialtyName');
     const physicianNameInput = document.querySelector('#PhysicianName');
-    if (specialtyNameInput.value && physicianNameInput.value) {
-        const newSpecialty = {
-            specialtyName: specialtyNameInput.value,
-            physicianInCharge: physicianNameInput.value
-        };
-        postSpecialty(newSpecialty).then(response => {
-            if (response.status === 200) {
-                console.log("Post Ok");
+    getToValidateSpecialty(specialtyNameInput.value).then(data => {
+        if (data) {
+            alert("The Specialty Name is already in the Database. Enter a different Name");
+            return;
+        }
+        else {
+            if (specialtyNameInput.value && physicianNameInput.value) {
+                const newSpecialty = {
+                    specialtyName: specialtyNameInput.value,
+                    physicianInCharge: physicianNameInput.value
+                };
+                postSpecialty(newSpecialty).then(response => {
+                    if (response.status === 200) {
+                        console.log("Post Ok");
+                    }
+                    else {
+                        console.log("The request failed");
+                    }
+                });
             }
-            else {
-                console.log("The request failed");
-            }
-        });
-    }
-    specialtyCreationform === null || specialtyCreationform === void 0 ? void 0 : specialtyCreationform.classList.add('display-none');
-    mainMenu === null || mainMenu === void 0 ? void 0 : mainMenu.classList.remove('display-none');
-    cancelBtn === null || cancelBtn === void 0 ? void 0 : cancelBtn.classList.add('display-none');
+            specialtyCreationform === null || specialtyCreationform === void 0 ? void 0 : specialtyCreationform.classList.add('display-none');
+            mainMenu === null || mainMenu === void 0 ? void 0 : mainMenu.classList.remove('display-none');
+            cancelBtn === null || cancelBtn === void 0 ? void 0 : cancelBtn.classList.add('display-none');
+        }
+    });
 }

@@ -28,6 +28,13 @@ export function getToValidatePatient(patientDNI) {
         return data;
     });
 }
+export function getToValidateSpecialty(spacialtyName) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const response = yield fetch(`http://localhost:8080/api/saintclaire/validate/specialty/${spacialtyName}`);
+        const data = yield response.json();
+        return data;
+    });
+}
 export function postSpecialty(specialty) {
     return __awaiter(this, void 0, void 0, function* () {
         const response = yield fetch('http://localhost:8080/api/saintclaire/create/specialty', {
@@ -66,6 +73,14 @@ export function putOnlyAppintmentInfo(patientDNI) {
 export function deletePatient(patientId) {
     return __awaiter(this, void 0, void 0, function* () {
         const response = yield fetch(`http://localhost:8080/api/saintclaire/delete/patient/${patientId}`, {
+            method: 'DELETE'
+        });
+        return response;
+    });
+}
+export function deleteSpecialty(specialtyId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const response = yield fetch(`http://localhost:8080/api/saintclaire/delete/specialty/${specialtyId}`, {
             method: 'DELETE'
         });
         return response;

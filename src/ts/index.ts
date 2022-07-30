@@ -1,5 +1,5 @@
 import { postSpecialty, getAllCompleteSpecialties, getToValidatePatient,
-     postPatient, getAllPatients, putOnlyAppintmentInfo, deletePatient } from "./actions/actions.js";
+     postPatient, getAllPatients, putOnlyAppintmentInfo, deletePatient, deleteSpecialty, getToValidateSpecialty } from "./actions/actions.js";
 
 
 //GLOBAL ELEMENTS SELECTION
@@ -333,7 +333,7 @@ function createSpecialtyListing(specialty:completeOutboundI): HTMLDivElement{
     const deleteSpecialtyBtn:HTMLButtonElement = document.createElement('button')
     deleteSpecialtyBtn.className = 'specialty-delete-button'
     deleteSpecialtyBtn.innerText = 'Delete'
-    deleteSpecialtyBtn.addEventListener('click', ()=> handleSpecialtyDelete())
+    deleteSpecialtyBtn.addEventListener('click', ()=> handleSpecialtyDelete(div))
 
     
 
@@ -375,37 +375,67 @@ function hanldeSpecialtyEdit(){
 }
 
 
-function handleSpecialtyDelete(){
+function handleSpecialtyDelete(div:HTMLDivElement){
+    const specialtyId:number = parseInt(div.classList[1].split('-')[1]);
+    getAllCompleteSpecialties().then(specialties => {
+        let specialty = specialties.find(specialty => specialty.specialtyId === specialtyId)
+        console.log();
 
+        if(specialty?.patientList[0] === undefined){
+            deleteSpecialty(specialtyId);
+        } else {
+            alert('Cannot be deleted. Delete ALL Patients inside the Specialty to proceed')
+        }
+
+        mainMenu?.classList.remove('display-none');
+        cancelBtn?.classList.add('display-none');
+        const divAllData:HTMLDivElement | null = document.querySelector('.specialties-container');
+        if(divAllData !== null){
+            divAllData.remove();
+        }
+                     
+    })
+
+    
 }
 
 
 function createSpecialty(e:SubmitEvent){
     e.preventDefault();
+    
     const specialtyNameInput = document.querySelector('#SpecialtyName') as HTMLInputElement;
     const physicianNameInput = document.querySelector('#PhysicianName') as HTMLInputElement;
 
-    if(specialtyNameInput.value && physicianNameInput.value){
-        const newSpecialty: specialtyInboundI = {
-            specialtyName: specialtyNameInput.value,
-            physicianInCharge: physicianNameInput.value
+    getToValidateSpecialty(specialtyNameInput.value).then(data => {
+        if(data){
+            alert("The Specialty Name is already in the Database. Enter a different Name")
+            return;
+        } else {
+            if(specialtyNameInput.value && physicianNameInput.value){
+                const newSpecialty: specialtyInboundI = {
+                    specialtyName: specialtyNameInput.value,
+                    physicianInCharge: physicianNameInput.value
+                }
+        
+                postSpecialty(newSpecialty).then(
+                    response => {
+                        if(response.status === 200){
+                            console.log("Post Ok");
+                        } else {
+                            console.log("The request failed");
+                        }
+                    }
+                )
+        
+            }
+        
+            specialtyCreationform?.classList.add('display-none');
+            mainMenu?.classList.remove('display-none');
+            cancelBtn?.classList.add('display-none');
+        
         }
 
-        postSpecialty(newSpecialty).then(
-            response => {
-                if(response.status === 200){
-                    console.log("Post Ok");
-                } else {
-                    console.log("The request failed");
-                }
-            }
-        )
-
-    }
-
-    specialtyCreationform?.classList.add('display-none');
-    mainMenu?.classList.remove('display-none');
-    cancelBtn?.classList.add('display-none');
+    })
 
 }
 
