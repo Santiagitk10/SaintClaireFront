@@ -131,6 +131,10 @@ function cancelAllDisplay(){
         divAllData.remove();
     }
     patientRegistrationForm?.classList.add('display-none');
+    const divPatientData: HTMLDivElement | null = document.querySelector('.patients-container');
+    if(divPatientData !== null){
+        divPatientData.remove();
+    }
 }
 
 function displaySpecialtyCreation(){
@@ -146,6 +150,8 @@ function displaySpecialtyCreation(){
 
 //FUNCTIONS
 function renderPatients(){
+    mainMenu?.classList.add('display-none');
+    cancelBtn?.classList.remove('display-none');
     getAllPatients().then(patients => {
         const displayContentDiv = document.querySelector('.display-content') as HTMLDivElement;
         const div:HTMLDivElement = document.createElement('div');
@@ -164,17 +170,17 @@ function renderSinglePatient(patient:patientOutboundI): HTMLDivElement{
     div.classList.add(`patient-${patient.patientId}`);
 
     const patientIdh3: HTMLElement = document.createElement('h3');
-    patientIdh3.innerText = patient.patientId.toString();
+    patientIdh3.innerText = 'Patient ID: ' + patient.patientId.toString();
     const patientDNIh3: HTMLElement = document.createElement('h3');
-    patientDNIh3.innerText = patient.patientDNI.toString();
+    patientDNIh3.innerText = 'Patient DNI: ' + patient.patientDNI.toString();
     const patientNameh3: HTMLElement = document.createElement('h3');
-    patientNameh3.innerText = patient.patientName;
+    patientNameh3.innerText = 'Patient Name: ' + patient.patientName;
     const patientAgeh3: HTMLElement = document.createElement('h3');
-    patientAgeh3.innerText = patient.age.toString();
+    patientAgeh3.innerText = 'Patient Age: ' + patient.age.toString();
     const appointmentDatesh3: HTMLElement = document.createElement('h3');
-    appointmentDatesh3.innerText = patient.appointmentDates;
+    appointmentDatesh3.innerText = 'Appointment Dates: ' + patient.appointmentDates;
     const nummberOfAppointmentsh3: HTMLElement = document.createElement('h3');
-    nummberOfAppointmentsh3.innerText = patient.numberOfAppointments.toString();
+    nummberOfAppointmentsh3.innerText = 'Number of Appointments: ' + patient.numberOfAppointments.toString();
 
     const addSpecialtyBtn: HTMLButtonElement = document.createElement('button');
     addSpecialtyBtn.className = 'single-patient-appointment-button';
