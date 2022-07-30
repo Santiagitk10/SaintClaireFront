@@ -13,10 +13,7 @@
         <button id="cancel-btn" class="display-none">Cancel</button>
         <div class="main-menu">
             <button id="create-specialty-btn">Create Specialty</button>
-
-            <!-- Si no está el usuario debe dar las opciones para el registro del paciente -->
             <button id="register-appointment-btn">Register Appointment</button> 
-
             <button id="show-all-data">Show All Data</button>
 
             
@@ -42,22 +39,16 @@
                 </fieldset>
             </form>
 
-            <!-- FORM FOR PATIENT VALIDATION IN STATE -->
-
-            <form class="initial-patient-validation-form display-none" action="#">
-                <fieldset>
-                    <legend>Register Appointment</legend>
-                    <label for="patientDNI">Patient DNI</label>
-                    <input id="patientDNI" type="text" required>
-                    <button>Submit</button>
-                </fieldset>
-            </form>
 
             <!-- FORM FOR PATIENT REGISTRATION -->
 
             <form class="patient-registration-form display-none" action="#">
                 <fieldset>
                     <legend>Patient Data</legend>
+
+                    <label for="patientDNI">Patient DNI</label>
+                    <input id="patientDNI" type="number" required>
+
                     <label for="patientName">Patient Name</label>
                     <input id="patientName" type="text" required minlength="10" maxlength="45">
 

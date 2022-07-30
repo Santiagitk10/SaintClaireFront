@@ -8,7 +8,8 @@ const mainMenu: HTMLDivElement | null = document.querySelector('.main-menu');
 const cancelBtn: HTMLButtonElement | null = document.querySelector('#cancel-btn');
 const showAllDataBtn: HTMLButtonElement | null = document.querySelector('#show-all-data');
 const registerAppointmentBtn: HTMLButtonElement | null = document.querySelector('#register-appointment-btn');
-const initialPatientValidationForm: HTMLFormElement | null = document.querySelector('.initial-patient-validation-form');
+const patientRegistrationForm: HTMLFormElement | null = document.querySelector('.patient-registration-form');
+const specialtySelectionSelect = document.querySelector('#specialtySelection') as HTMLSelectElement;
 
 
 //STATE
@@ -50,7 +51,7 @@ createSpecialtyBtn?.addEventListener('click', () => displaySpecialtyCreation());
 cancelBtn?.addEventListener('click', () => cancelAllDisplay());
 showAllDataBtn?.addEventListener('click', () => displayShowAllData());
 registerAppointmentBtn?.addEventListener('click', () => displayAppointmentRegistration());
-initialPatientValidationForm?.addEventListener('submit', (e) => validateUserInDB(e));
+patientRegistrationForm?.addEventListener('submit', (e) => validateUserInDB(e));
 
 
 
@@ -70,10 +71,15 @@ function displayAppointmentRegistration(){
             return;
         } else {
             mainMenu?.classList.add('display-none');
-            initialPatientValidationForm?.classList.remove('display-none');
-            const patientIdInput = document.querySelector('#patientDNI') as HTMLInputElement;
-            patientIdInput.value = '';
             cancelBtn?.classList.remove('display-none');
+            patientRegistrationForm?.classList.remove('display-none');
+            const patientDNIInput = document.querySelector('#patientDNI') as HTMLInputElement;
+            const patientNameInput = document.querySelector('#patientName') as HTMLInputElement;
+            const patientAgeInput = document.querySelector('#patientAge') as HTMLInputElement;
+            patientDNIInput.value = "";
+            patientNameInput.value = "";
+            patientAgeInput.value = "";
+            setSpecialtySelectMenu(specialtySelectionSelect);
         }
     })
     
@@ -111,8 +117,6 @@ function cancelAllDisplay(){
     if(divAllData !== null){
         divAllData.remove();
     }
-    initialPatientValidationForm?.classList.add('display-none');
-    const patientRegistrationForm: HTMLFormElement | null = document.querySelector('.patient-registration-form');
     patientRegistrationForm?.classList.add('display-none');
 }
 
@@ -130,43 +134,21 @@ function displaySpecialtyCreation(){
 //FUNCTIONS
 function validateUserInDB(e:SubmitEvent){
     e.preventDefault();
-    const isNaNMessage = document.querySelector('.p-message') as HTMLParagraphElement;
-    isNaNMessage?.remove();
     const patientDNIInput = document.querySelector('#patientDNI') as HTMLInputElement;
-    let inputValue: number = parseInt(patientDNIInput.value); 
-    if(isNaN(inputValue)){
-        const pMessage = document.createElement('p');
-        pMessage.className = 'p-message';
-        pMessage.innerText = 'The DNI must be a number';
-        const displayContentDiv = document.querySelector('.display-content') as HTMLDivElement;
-        displayContentDiv.append(pMessage);
-    } else {
+    const patientNameInput = document.querySelector('#patientName') as HTMLInputElement;
+    const patientAgeInput = document.querySelector('#patientAge') as HTMLInputElement;
 
-        getToValidatePatient(inputValue).then(isDNIPresent => {
+
+        getToValidatePatient(parseInt(patientDNIInput.value)).then(isDNIPresent => {
             if(isDNIPresent){
-                //     si lo encontró mostrar para que seleccione specialty
-                //     habrá que validar que no esté en el specialty el paciente
-                //     si está aumentar todo pero no agregar paciente
-            } else {
-                patientDNIInput.value = ""; //OJO CON ESTE
-                initialPatientValidationForm?.classList.add('display-none');
-                cancelBtn?.classList.remove('display-none');
-                const patientRegistrationForm: HTMLFormElement | null = document.querySelector('.patient-registration-form');
-                patientRegistrationForm?.classList.remove('display-none');
-                const specialtySelectionSelect = document.querySelector('#specialtySelection') as HTMLSelectElement;
-                setSpecialtySelectMenu(specialtySelectionSelect);
-                patientRegistrationForm?.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    const patientNameInput = document.querySelector('#patientName') as HTMLInputElement;
-                    const patientAgeInput = document.querySelector('#patientAge') as HTMLInputElement;
+                    alert('The patient already exist. Show patient Data to register an appointment');
+            } else {                
                     const newPatient: patientInboundI = {
-                        patientDNI: inputValue,
+                        patientDNI: parseInt(patientDNIInput.value),
                         patientName: patientNameInput.value,
                         age: parseInt(patientAgeInput.value),
                         fkSpecialtyId: parseInt(specialtySelectionSelect.value)
                     }
-
-                    console.log(newPatient);
 
                     postPatient(newPatient).then(
                         response => {
@@ -177,19 +159,12 @@ function validateUserInDB(e:SubmitEvent){
                             }
                         }
                     )
-                    patientDNIInput.value = "";//Revisar
-                    patientNameInput.value = "";
-                    patientAgeInput.value = "";
-                    patientRegistrationForm?.classList.add('display-none');
-
-                    
-
-
-
-                });
             }
         })
-    }
+
+        patientRegistrationForm?.classList.add('display-none');
+        cancelBtn?.classList.add('display-none');
+        mainMenu?.classList.remove('display-none');
 }
 
 
@@ -197,6 +172,9 @@ function validateUserInDB(e:SubmitEvent){
 
 
 function setSpecialtySelectMenu(select:HTMLSelectElement){
+    while(select.firstChild){
+        select.removeChild(select.firstChild);
+    }
     getAllCompleteSpecialties().then(specialties => {
         let specialtiesDisplay = specialties.map(specialty => specialty.specialtyId + ". " + specialty.specialtyName);
         specialtiesDisplay.forEach(specialtyToDisplay => {
