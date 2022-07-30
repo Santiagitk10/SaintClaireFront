@@ -63,3 +63,11 @@ export function putOnlyAppintmentInfo(patientDNI) {
         return response;
     });
 }
+export function deletePatient(patientId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const response = yield fetch(`http://localhost:8080/api/saintclaire/delete/patient/${patientId}`, {
+            method: 'DELETE'
+        });
+        return response;
+    });
+}

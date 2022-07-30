@@ -59,3 +59,12 @@ export async function putOnlyAppintmentInfo(patientDNI:number){
 
     return response;
 }
+
+export async function deletePatient(patientId:number){
+  const response:Response = await fetch(`http://localhost:8080/api/saintclaire/delete/patient/${patientId}`, 
+  {
+    method: 'DELETE'
+  })
+
+  return response;
+}

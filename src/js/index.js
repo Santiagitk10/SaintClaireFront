@@ -1,4 +1,4 @@
-import { postSpecialty, getAllCompleteSpecialties, getToValidatePatient, postPatient, getAllPatients, putOnlyAppintmentInfo } from "./actions/actions.js";
+import { postSpecialty, getAllCompleteSpecialties, getToValidatePatient, postPatient, getAllPatients, putOnlyAppintmentInfo, deletePatient } from "./actions/actions.js";
 //GLOBAL ELEMENTS SELECTION
 const specialtyCreationform = document.querySelector('.specialty-creation-form');
 const createSpecialtyBtn = document.querySelector('#create-specialty-btn');
@@ -119,15 +119,11 @@ function renderSinglePatient(patient) {
     addSpecialtyBtn.className = 'single-patient-appointment-button';
     addSpecialtyBtn.innerText = 'Add Appointment';
     addSpecialtyBtn.addEventListener('click', () => handleAppointmentAddition(div, patient));
-    const editPatientBtn = document.createElement('button');
-    editPatientBtn.className = 'single-patient-edit-button';
-    editPatientBtn.innerText = 'Edit';
-    editPatientBtn.addEventListener('click', () => handlePatientEdition());
     const deletePatientBtn = document.createElement('button');
     deletePatientBtn.className = 'single-patient-delete-button';
     deletePatientBtn.innerText = 'Delete';
-    deletePatientBtn.addEventListener('click', () => handlePatienteDeletion());
-    div.append(patientIdh3, patientDNIh3, patientNameh3, patientAgeh3, appointmentDatesh3, nummberOfAppointmentsh3, addSpecialtyBtn, editPatientBtn, deletePatientBtn);
+    deletePatientBtn.addEventListener('click', () => handlePatienteDeletion(div));
+    div.append(patientIdh3, patientDNIh3, patientNameh3, patientAgeh3, appointmentDatesh3, nummberOfAppointmentsh3, addSpecialtyBtn, deletePatientBtn);
     return div;
 }
 function handleAppointmentAddition(div, receivedPatient) {
@@ -136,8 +132,6 @@ function handleAppointmentAddition(div, receivedPatient) {
     const selectEl = document.createElement('select');
     setSpecialtySelectMenu(selectEl);
     div.append(selectP, selectEl);
-    const editBtn = document.querySelector('.single-patient-edit-button');
-    editBtn.disabled = true;
     const deleteBtn = document.querySelector('.single-patient-delete-button');
     deleteBtn.disabled = true;
     selectEl.addEventListener('change', function () {
@@ -146,12 +140,7 @@ function handleAppointmentAddition(div, receivedPatient) {
             let patient = specialty === null || specialty === void 0 ? void 0 : specialty.patientList.find(patient => patient.patientDNI === receivedPatient.patientDNI);
             if (patient === undefined) {
                 //Si no está toca agregarlo a la especialidad, agregar fecha y aumentar contador.
-                const newPatient = {
-                    patientDNI: receivedPatient.patientDNI,
-                    patientName: receivedPatient.patientName,
-                    age: receivedPatient.age,
-                    fkSpecialtyId: 0
-                };
+                putOnlyAppintmentInfo(receivedPatient.patientDNI);
             }
             else {
                 //Si sí está solo es agregar fecha y aumentar contador.
@@ -166,9 +155,15 @@ function handleAppointmentAddition(div, receivedPatient) {
         });
     });
 }
-function handlePatientEdition() {
-}
-function handlePatienteDeletion() {
+function handlePatienteDeletion(div) {
+    const patientId = parseInt(div.classList[1].split('-')[1]);
+    deletePatient(patientId);
+    mainMenu === null || mainMenu === void 0 ? void 0 : mainMenu.classList.remove('display-none');
+    cancelBtn === null || cancelBtn === void 0 ? void 0 : cancelBtn.classList.add('display-none');
+    const divPatientData = document.querySelector('.patients-container');
+    if (divPatientData !== null) {
+        divPatientData.remove();
+    }
 }
 function validateUserInDB(e) {
     e.preventDefault();
@@ -230,7 +225,15 @@ function createSpecialtyListing(specialty) {
     h3.innerText = 'Specialty Name: ' + specialty.specialtyName;
     const h4 = document.createElement('h4');
     h4.innerText = 'Physician in Charge: ' + specialty.physicianInCharge;
-    div.append(h2, h3, h4);
+    const editSpecialtyBtn = document.createElement('button');
+    editSpecialtyBtn.className = 'specialty-edit-button';
+    editSpecialtyBtn.innerText = 'Edit';
+    editSpecialtyBtn.addEventListener('click', () => hanldeSpecialtyEdit());
+    const deleteSpecialtyBtn = document.createElement('button');
+    deleteSpecialtyBtn.className = 'specialty-delete-button';
+    deleteSpecialtyBtn.innerText = 'Delete';
+    deleteSpecialtyBtn.addEventListener('click', () => handleSpecialtyDelete());
+    div.append(h2, h3, h4, editSpecialtyBtn, deleteSpecialtyBtn);
     specialty.patientList.forEach(patient => {
         const singlePatientDiv = document.createElement('div');
         singlePatientDiv.className = 'patient-register-container';
@@ -244,12 +247,17 @@ function createSpecialtyListing(specialty) {
         appointmentDatesh4.innerText = 'Appointment Dates: ' + patient.appointmentDates;
         const numberOfAppointmentsh4 = document.createElement('h4');
         numberOfAppointmentsh4.innerText = 'Number of Appointments: ' + patient.numberOfAppointments;
-        const fkSpecialtyIdh4 = document.createElement('h4');
-        fkSpecialtyIdh4.innerText = 'Specialty ID: ' + patient.fkSpecialtyId;
-        singlePatientDiv.append(patientDNIh4, patientNameh4, ageh4, appointmentDatesh4, numberOfAppointmentsh4, fkSpecialtyIdh4);
+        // const fkSpecialtyIdh4:HTMLElement = document.createElement('h4');
+        // fkSpecialtyIdh4.innerText = 'Specialty ID: ' + patient.fkSpecialtyId;
+        // fkSpecialtyIdh4
+        singlePatientDiv.append(patientDNIh4, patientNameh4, ageh4, appointmentDatesh4, numberOfAppointmentsh4);
         div.append(singlePatientDiv);
     });
     return div;
+}
+function hanldeSpecialtyEdit() {
+}
+function handleSpecialtyDelete() {
 }
 function createSpecialty(e) {
     e.preventDefault();

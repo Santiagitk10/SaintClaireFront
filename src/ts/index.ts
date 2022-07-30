@@ -1,4 +1,5 @@
-import { postSpecialty, getAllCompleteSpecialties, getToValidatePatient, postPatient, getAllPatients, putOnlyAppintmentInfo } from "./actions/actions.js";
+import { postSpecialty, getAllCompleteSpecialties, getToValidatePatient,
+     postPatient, getAllPatients, putOnlyAppintmentInfo, deletePatient } from "./actions/actions.js";
 
 
 //GLOBAL ELEMENTS SELECTION
@@ -187,18 +188,13 @@ function renderSinglePatient(patient:patientOutboundI): HTMLDivElement{
     addSpecialtyBtn.innerText = 'Add Appointment';
     addSpecialtyBtn.addEventListener('click', ()=> handleAppointmentAddition(div,patient));
 
-    const editPatientBtn: HTMLButtonElement = document.createElement('button');
-    editPatientBtn.className = 'single-patient-edit-button';
-    editPatientBtn.innerText = 'Edit';
-    editPatientBtn.addEventListener('click', ()=> handlePatientEdition());
-
     const deletePatientBtn: HTMLButtonElement = document.createElement('button');
     deletePatientBtn.className = 'single-patient-delete-button';
     deletePatientBtn.innerText = 'Delete';
-    deletePatientBtn.addEventListener('click', ()=> handlePatienteDeletion());
+    deletePatientBtn.addEventListener('click', ()=> handlePatienteDeletion(div));
 
     div.append(patientIdh3, patientDNIh3, patientNameh3, patientAgeh3,  appointmentDatesh3, nummberOfAppointmentsh3,
-        addSpecialtyBtn, editPatientBtn, deletePatientBtn);
+        addSpecialtyBtn, deletePatientBtn);
 
     return div;
 
@@ -211,8 +207,6 @@ function handleAppointmentAddition(div:HTMLDivElement, receivedPatient: patientO
     const selectEl:HTMLSelectElement = document.createElement('select');
     setSpecialtySelectMenu(selectEl);
     div.append(selectP, selectEl);
-    const editBtn = document.querySelector('.single-patient-edit-button') as HTMLButtonElement;
-    editBtn.disabled = true;
     const deleteBtn = document.querySelector('.single-patient-delete-button') as HTMLButtonElement;
     deleteBtn.disabled = true;
     selectEl.addEventListener('change', function(){
@@ -223,12 +217,7 @@ function handleAppointmentAddition(div:HTMLDivElement, receivedPatient: patientO
 
             if(patient === undefined){
                 //Si no está toca agregarlo a la especialidad, agregar fecha y aumentar contador.
-                const newPatient: patientInboundI = {
-                    patientDNI: receivedPatient.patientDNI,
-                    patientName: receivedPatient.patientName,
-                    age: receivedPatient.age,
-                    fkSpecialtyId: 0
-                }
+                putOnlyAppintmentInfo(receivedPatient.patientDNI);
             } else {
                 //Si sí está solo es agregar fecha y aumentar contador.
                 putOnlyAppintmentInfo(receivedPatient.patientDNI);
@@ -238,8 +227,8 @@ function handleAppointmentAddition(div:HTMLDivElement, receivedPatient: patientO
             cancelBtn?.classList.add('display-none');
             const divPatientData: HTMLDivElement | null = document.querySelector('.patients-container');
             if(divPatientData !== null){
-            divPatientData.remove();
-    }
+                divPatientData.remove();
+            }
                                     
         })
 
@@ -247,13 +236,16 @@ function handleAppointmentAddition(div:HTMLDivElement, receivedPatient: patientO
 }
 
 
-function handlePatientEdition(){
 
-}
-
-
-function handlePatienteDeletion(){
-    
+function handlePatienteDeletion(div:HTMLDivElement){
+    const patientId:number = parseInt(div.classList[1].split('-')[1])
+    deletePatient(patientId);
+    mainMenu?.classList.remove('display-none');
+    cancelBtn?.classList.add('display-none');
+    const divPatientData: HTMLDivElement | null = document.querySelector('.patients-container');
+    if(divPatientData !== null){
+        divPatientData.remove();
+    }
 }
 
 
@@ -333,7 +325,19 @@ function createSpecialtyListing(specialty:completeOutboundI): HTMLDivElement{
     const h4:HTMLElement = document.createElement('h4');
     h4.innerText = 'Physician in Charge: ' + specialty.physicianInCharge
 
-    div.append(h2, h3, h4);
+    const editSpecialtyBtn:HTMLButtonElement = document.createElement('button')
+    editSpecialtyBtn.className = 'specialty-edit-button'
+    editSpecialtyBtn.innerText = 'Edit'
+    editSpecialtyBtn.addEventListener('click', ()=> hanldeSpecialtyEdit())
+
+    const deleteSpecialtyBtn:HTMLButtonElement = document.createElement('button')
+    deleteSpecialtyBtn.className = 'specialty-delete-button'
+    deleteSpecialtyBtn.innerText = 'Delete'
+    deleteSpecialtyBtn.addEventListener('click', ()=> handleSpecialtyDelete())
+
+    
+
+    div.append(h2, h3, h4, editSpecialtyBtn,  deleteSpecialtyBtn);
 
     specialty.patientList.forEach(patient => {
         const singlePatientDiv:HTMLElement = document.createElement('div');
@@ -349,10 +353,11 @@ function createSpecialtyListing(specialty:completeOutboundI): HTMLDivElement{
         appointmentDatesh4.innerText = 'Appointment Dates: ' + patient.appointmentDates;
         const numberOfAppointmentsh4:HTMLElement = document.createElement('h4');
         numberOfAppointmentsh4.innerText = 'Number of Appointments: ' +  patient.numberOfAppointments;
-        const fkSpecialtyIdh4:HTMLElement = document.createElement('h4');
-        fkSpecialtyIdh4.innerText = 'Specialty ID: ' + patient.fkSpecialtyId;
+        // const fkSpecialtyIdh4:HTMLElement = document.createElement('h4');
+        // fkSpecialtyIdh4.innerText = 'Specialty ID: ' + patient.fkSpecialtyId;
+        // fkSpecialtyIdh4
 
-        singlePatientDiv.append(patientDNIh4, patientNameh4, ageh4, appointmentDatesh4, numberOfAppointmentsh4, fkSpecialtyIdh4);
+        singlePatientDiv.append(patientDNIh4, patientNameh4, ageh4, appointmentDatesh4, numberOfAppointmentsh4);
 
         div.append(singlePatientDiv);
 
@@ -364,6 +369,15 @@ function createSpecialtyListing(specialty:completeOutboundI): HTMLDivElement{
 }
 
 
+
+function hanldeSpecialtyEdit(){
+
+}
+
+
+function handleSpecialtyDelete(){
+
+}
 
 
 function createSpecialty(e:SubmitEvent){
