@@ -52,3 +52,14 @@ export function postPatient(patient) {
         return response;
     });
 }
+export function putOnlyAppintmentInfo(patientDNI) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const response = yield fetch(`http://localhost:8080/api/saintclaire/update/patient/no/specialty/${patientDNI}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+        return response;
+    });
+}

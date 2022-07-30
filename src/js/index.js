@@ -1,4 +1,4 @@
-import { postSpecialty, getAllCompleteSpecialties, getToValidatePatient, postPatient, getAllPatients } from "./actions/actions.js";
+import { postSpecialty, getAllCompleteSpecialties, getToValidatePatient, postPatient, getAllPatients, putOnlyAppintmentInfo } from "./actions/actions.js";
 //GLOBAL ELEMENTS SELECTION
 const specialtyCreationform = document.querySelector('.specialty-creation-form');
 const createSpecialtyBtn = document.querySelector('#create-specialty-btn');
@@ -118,7 +118,7 @@ function renderSinglePatient(patient) {
     const addSpecialtyBtn = document.createElement('button');
     addSpecialtyBtn.className = 'single-patient-appointment-button';
     addSpecialtyBtn.innerText = 'Add Appointment';
-    addSpecialtyBtn.addEventListener('click', () => handleAppointmentAddition());
+    addSpecialtyBtn.addEventListener('click', () => handleAppointmentAddition(div, patient));
     const editPatientBtn = document.createElement('button');
     editPatientBtn.className = 'single-patient-edit-button';
     editPatientBtn.innerText = 'Edit';
@@ -130,7 +130,41 @@ function renderSinglePatient(patient) {
     div.append(patientIdh3, patientDNIh3, patientNameh3, patientAgeh3, appointmentDatesh3, nummberOfAppointmentsh3, addSpecialtyBtn, editPatientBtn, deletePatientBtn);
     return div;
 }
-function handleAppointmentAddition() {
+function handleAppointmentAddition(div, receivedPatient) {
+    const selectP = document.createElement('p');
+    selectP.innerText = 'Select a Specialty';
+    const selectEl = document.createElement('select');
+    setSpecialtySelectMenu(selectEl);
+    div.append(selectP, selectEl);
+    const editBtn = document.querySelector('.single-patient-edit-button');
+    editBtn.disabled = true;
+    const deleteBtn = document.querySelector('.single-patient-delete-button');
+    deleteBtn.disabled = true;
+    selectEl.addEventListener('change', function () {
+        getAllCompleteSpecialties().then(specialties => {
+            let specialty = specialties.find(specialty => specialty.specialtyId.toString() === selectEl.value);
+            let patient = specialty === null || specialty === void 0 ? void 0 : specialty.patientList.find(patient => patient.patientDNI === receivedPatient.patientDNI);
+            if (patient === undefined) {
+                //Si no está toca agregarlo a la especialidad, agregar fecha y aumentar contador.
+                const newPatient = {
+                    patientDNI: receivedPatient.patientDNI,
+                    patientName: receivedPatient.patientName,
+                    age: receivedPatient.age,
+                    fkSpecialtyId: 0
+                };
+            }
+            else {
+                //Si sí está solo es agregar fecha y aumentar contador.
+                putOnlyAppintmentInfo(receivedPatient.patientDNI);
+            }
+            mainMenu === null || mainMenu === void 0 ? void 0 : mainMenu.classList.remove('display-none');
+            cancelBtn === null || cancelBtn === void 0 ? void 0 : cancelBtn.classList.add('display-none');
+            const divPatientData = document.querySelector('.patients-container');
+            if (divPatientData !== null) {
+                divPatientData.remove();
+            }
+        });
+    });
 }
 function handlePatientEdition() {
 }
@@ -138,6 +172,10 @@ function handlePatienteDeletion() {
 }
 function validateUserInDB(e) {
     e.preventDefault();
+    if (specialtySelectionSelect.value === "") {
+        alert('One Specialty must be selected!');
+        return;
+    }
     const patientDNIInput = document.querySelector('#patientDNI');
     const patientNameInput = document.querySelector('#patientName');
     const patientAgeInput = document.querySelector('#patientAge');
@@ -172,6 +210,8 @@ function setSpecialtySelectMenu(select) {
     }
     getAllCompleteSpecialties().then(specialties => {
         let specialtiesDisplay = specialties.map(specialty => specialty.specialtyId + ". " + specialty.specialtyName);
+        const firstEmptyOption = document.createElement('option');
+        select.append(firstEmptyOption);
         specialtiesDisplay.forEach(specialtyToDisplay => {
             const optionElement = document.createElement('option');
             optionElement.innerText = specialtyToDisplay;

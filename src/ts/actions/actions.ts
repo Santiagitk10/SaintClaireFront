@@ -47,3 +47,15 @@ export async function postPatient(patient:patientInboundI){
     })
     return response;
 }
+
+export async function putOnlyAppintmentInfo(patientDNI:number){
+    const response:Response = await fetch(`http://localhost:8080/api/saintclaire/update/patient/no/specialty/${patientDNI}`,
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json' 
+      },
+    })
+
+    return response;
+}

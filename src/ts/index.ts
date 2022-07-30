@@ -1,4 +1,4 @@
-import { postSpecialty, getAllCompleteSpecialties, getToValidatePatient, postPatient, getAllPatients } from "./actions/actions.js";
+import { postSpecialty, getAllCompleteSpecialties, getToValidatePatient, postPatient, getAllPatients, putOnlyAppintmentInfo } from "./actions/actions.js";
 
 
 //GLOBAL ELEMENTS SELECTION
@@ -185,7 +185,7 @@ function renderSinglePatient(patient:patientOutboundI): HTMLDivElement{
     const addSpecialtyBtn: HTMLButtonElement = document.createElement('button');
     addSpecialtyBtn.className = 'single-patient-appointment-button';
     addSpecialtyBtn.innerText = 'Add Appointment';
-    addSpecialtyBtn.addEventListener('click', ()=> handleAppointmentAddition());
+    addSpecialtyBtn.addEventListener('click', ()=> handleAppointmentAddition(div,patient));
 
     const editPatientBtn: HTMLButtonElement = document.createElement('button');
     editPatientBtn.className = 'single-patient-edit-button';
@@ -204,8 +204,46 @@ function renderSinglePatient(patient:patientOutboundI): HTMLDivElement{
 
 }
 
-function handleAppointmentAddition(){
+function handleAppointmentAddition(div:HTMLDivElement, receivedPatient: patientOutboundI){
 
+    const selectP:HTMLParagraphElement = document.createElement('p');
+    selectP.innerText = 'Select a Specialty';
+    const selectEl:HTMLSelectElement = document.createElement('select');
+    setSpecialtySelectMenu(selectEl);
+    div.append(selectP, selectEl);
+    const editBtn = document.querySelector('.single-patient-edit-button') as HTMLButtonElement;
+    editBtn.disabled = true;
+    const deleteBtn = document.querySelector('.single-patient-delete-button') as HTMLButtonElement;
+    deleteBtn.disabled = true;
+    selectEl.addEventListener('change', function(){
+    
+        getAllCompleteSpecialties().then(specialties => {
+            let specialty = specialties.find(specialty => specialty.specialtyId.toString() === selectEl.value);
+            let patient = specialty?.patientList.find(patient => patient.patientDNI === receivedPatient.patientDNI);
+
+            if(patient === undefined){
+                //Si no está toca agregarlo a la especialidad, agregar fecha y aumentar contador.
+                const newPatient: patientInboundI = {
+                    patientDNI: receivedPatient.patientDNI,
+                    patientName: receivedPatient.patientName,
+                    age: receivedPatient.age,
+                    fkSpecialtyId: 0
+                }
+            } else {
+                //Si sí está solo es agregar fecha y aumentar contador.
+                putOnlyAppintmentInfo(receivedPatient.patientDNI);
+            }
+
+            mainMenu?.classList.remove('display-none');
+            cancelBtn?.classList.add('display-none');
+            const divPatientData: HTMLDivElement | null = document.querySelector('.patients-container');
+            if(divPatientData !== null){
+            divPatientData.remove();
+    }
+                                    
+        })
+
+    });
 }
 
 
@@ -222,6 +260,10 @@ function handlePatienteDeletion(){
 
 function validateUserInDB(e:SubmitEvent){
     e.preventDefault();
+    if(specialtySelectionSelect.value === ""){
+        alert('One Specialty must be selected!');
+        return;
+    }
     const patientDNIInput = document.querySelector('#patientDNI') as HTMLInputElement;
     const patientNameInput = document.querySelector('#patientName') as HTMLInputElement;
     const patientAgeInput = document.querySelector('#patientAge') as HTMLInputElement;
@@ -265,6 +307,8 @@ function setSpecialtySelectMenu(select:HTMLSelectElement){
     }
     getAllCompleteSpecialties().then(specialties => {
         let specialtiesDisplay = specialties.map(specialty => specialty.specialtyId + ". " + specialty.specialtyName);
+        const firstEmptyOption = document.createElement('option');
+        select.append(firstEmptyOption);
         specialtiesDisplay.forEach(specialtyToDisplay => {
             const optionElement = document.createElement('option') as HTMLOptionElement;
             optionElement.innerText = specialtyToDisplay;
