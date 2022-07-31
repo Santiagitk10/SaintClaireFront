@@ -1,4 +1,4 @@
-import { postSpecialty, getAllCompleteSpecialties, getToValidatePatient, postPatient, getAllPatients, putOnlyAppintmentInfo, deletePatient, deleteSpecialty, getToValidateSpecialty } from "./actions/actions.js";
+import { postSpecialty, getAllCompleteSpecialties, getToValidatePatient, postPatient, getAllPatients, putOnlyAppintmentInfo, deletePatient, deleteSpecialty, getToValidateSpecialty, putSpecialty } from "./actions/actions.js";
 //GLOBAL ELEMENTS SELECTION
 const specialtyCreationform = document.querySelector('.specialty-creation-form');
 const createSpecialtyBtn = document.querySelector('#create-specialty-btn');
@@ -228,7 +228,7 @@ function createSpecialtyListing(specialty) {
     const editSpecialtyBtn = document.createElement('button');
     editSpecialtyBtn.className = 'specialty-edit-button';
     editSpecialtyBtn.innerText = 'Edit';
-    editSpecialtyBtn.addEventListener('click', () => hanldeSpecialtyEdit());
+    editSpecialtyBtn.addEventListener('click', () => hanldeSpecialtyEdit(div, specialty));
     const deleteSpecialtyBtn = document.createElement('button');
     deleteSpecialtyBtn.className = 'specialty-delete-button';
     deleteSpecialtyBtn.innerText = 'Delete';
@@ -255,7 +255,42 @@ function createSpecialtyListing(specialty) {
     });
     return div;
 }
-function hanldeSpecialtyEdit() {
+function hanldeSpecialtyEdit(div, specialty) {
+    const formEl = document.createElement('form');
+    formEl.className = "edit-specialty-form";
+    const fieldsetEl = document.createElement('fieldset');
+    const legendEl = document.createElement('legend');
+    legendEl.innerText = "Edit Specialty";
+    const specialtyNameLabel = document.createElement('label');
+    specialtyNameLabel.innerText = "Specialty Name";
+    const specialtyNameInput = document.createElement('input');
+    specialtyNameInput.type = "text";
+    specialtyNameInput.id = "editSpecialtyName";
+    specialtyNameInput.required = true;
+    specialtyNameInput.minLength = 5;
+    specialtyNameInput.maxLength = 100;
+    const physicianLabel = document.createElement('label');
+    physicianLabel.innerText = "Physician Name";
+    const physicianInput = document.createElement('input');
+    physicianInput.type = "text";
+    physicianInput.id = "editPhysicianName";
+    physicianInput.required = true;
+    physicianInput.minLength = 10;
+    physicianInput.maxLength = 45;
+    const subBtn = document.createElement('button');
+    subBtn.innerText = "Submit";
+    physicianLabel.append(physicianInput);
+    specialtyNameLabel.append(specialtyNameInput);
+    fieldsetEl.append(legendEl, specialtyNameLabel, physicianLabel, subBtn);
+    formEl.append(fieldsetEl);
+    div.append(formEl);
+    formEl.addEventListener('submit', function () {
+        let newSpecialty = {
+            specialtyName: specialtyNameInput.value,
+            physicianInCharge: physicianInput.value
+        };
+        putSpecialty(specialty.specialtyId, newSpecialty);
+    });
 }
 function handleSpecialtyDelete(div) {
     const specialtyId = parseInt(div.classList[1].split('-')[1]);

@@ -70,6 +70,18 @@ export function putOnlyAppintmentInfo(patientDNI) {
         return response;
     });
 }
+export function putSpecialty(specialtyId, specialty) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const response = yield fetch(`http://localhost:8080/api/saintclaire/update/specialty/${specialtyId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(specialty)
+        });
+        return response;
+    });
+}
 export function deletePatient(patientId) {
     return __awaiter(this, void 0, void 0, function* () {
         const response = yield fetch(`http://localhost:8080/api/saintclaire/delete/patient/${patientId}`, {

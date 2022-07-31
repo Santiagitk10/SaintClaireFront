@@ -66,6 +66,22 @@ export async function putOnlyAppintmentInfo(patientDNI:number){
     return response;
 }
 
+
+export async function putSpecialty(specialtyId:number, specialty:specialtyInboundI){
+  const response:Response = await fetch(`http://localhost:8080/api/saintclaire/update/specialty/${specialtyId}`, 
+  {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json' 
+    },
+    body: JSON.stringify(specialty)
+  })
+
+  return response;
+}
+
+
+
 export async function deletePatient(patientId:number){
   const response:Response = await fetch(`http://localhost:8080/api/saintclaire/delete/patient/${patientId}`, 
   {
