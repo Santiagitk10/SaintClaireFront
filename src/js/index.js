@@ -9,8 +9,6 @@ const registerAppointmentBtn = document.querySelector('#register-appointment-btn
 const patientRegistrationForm = document.querySelector('.patient-registration-form');
 const specialtySelectionSelect = document.querySelector('#specialtySelection');
 const showPatientsBtn = document.querySelector('#show-patients');
-//STATE
-let fullState = [];
 //EVENT LISTENERS
 specialtyCreationform === null || specialtyCreationform === void 0 ? void 0 : specialtyCreationform.addEventListener('submit', (e) => createSpecialty(e));
 createSpecialtyBtn === null || createSpecialtyBtn === void 0 ? void 0 : createSpecialtyBtn.addEventListener('click', () => displaySpecialtyCreation());
@@ -50,8 +48,6 @@ function displayShowAllData() {
     mainMenu === null || mainMenu === void 0 ? void 0 : mainMenu.classList.add('display-none');
     cancelBtn === null || cancelBtn === void 0 ? void 0 : cancelBtn.classList.remove('display-none');
     getAllCompleteSpecialties().then(specialties => {
-        //TODO Revisar si si necesito el state porque creo que mejor estoy leyento todo dela base datos
-        fullState = specialties;
         const displayContentDiv = document.querySelector('.display-content');
         const div = document.createElement('div');
         div.className = "specialties-container";
@@ -64,7 +60,6 @@ function displayShowAllData() {
 function cancelAllDisplay() {
     cancelBtn === null || cancelBtn === void 0 ? void 0 : cancelBtn.classList.add('display-none');
     mainMenu === null || mainMenu === void 0 ? void 0 : mainMenu.classList.remove('display-none');
-    //AGREGAR TODOS LOS COMPONENTES
     specialtyCreationform === null || specialtyCreationform === void 0 ? void 0 : specialtyCreationform.classList.add('display-none');
     const divAllData = document.querySelector('.specialties-container');
     if (divAllData !== null) {
@@ -139,11 +134,9 @@ function handleAppointmentAddition(div, receivedPatient) {
             let specialty = specialties.find(specialty => specialty.specialtyId.toString() === selectEl.value);
             let patient = specialty === null || specialty === void 0 ? void 0 : specialty.patientList.find(patient => patient.patientDNI === receivedPatient.patientDNI);
             if (patient === undefined) {
-                //Si no está toca agregarlo a la especialidad, agregar fecha y aumentar contador.
                 putOnlyAppintmentInfo(receivedPatient.patientDNI);
             }
             else {
-                //Si sí está solo es agregar fecha y aumentar contador.
                 putOnlyAppintmentInfo(receivedPatient.patientDNI);
             }
             mainMenu === null || mainMenu === void 0 ? void 0 : mainMenu.classList.remove('display-none');
@@ -247,9 +240,6 @@ function createSpecialtyListing(specialty) {
         appointmentDatesh4.innerText = 'Appointment Dates: ' + patient.appointmentDates;
         const numberOfAppointmentsh4 = document.createElement('h4');
         numberOfAppointmentsh4.innerText = 'Number of Appointments: ' + patient.numberOfAppointments;
-        // const fkSpecialtyIdh4:HTMLElement = document.createElement('h4');
-        // fkSpecialtyIdh4.innerText = 'Specialty ID: ' + patient.fkSpecialtyId;
-        // fkSpecialtyIdh4
         singlePatientDiv.append(patientDNIh4, patientNameh4, ageh4, appointmentDatesh4, numberOfAppointmentsh4);
         div.append(singlePatientDiv);
     });

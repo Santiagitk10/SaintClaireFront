@@ -1,6 +1,10 @@
+import {specialtyInboundI, completeOutboundI, patientInboundI, patientOutboundI} from "./interfaces/interfaces.js"
+
 import { postSpecialty, getAllCompleteSpecialties, getToValidatePatient,
      postPatient, getAllPatients, putOnlyAppintmentInfo, deletePatient, deleteSpecialty,
       getToValidateSpecialty, putSpecialty } from "./actions/actions.js";
+
+
 
 
 //GLOBAL ELEMENTS SELECTION
@@ -13,49 +17,6 @@ const registerAppointmentBtn: HTMLButtonElement | null = document.querySelector(
 const patientRegistrationForm: HTMLFormElement | null = document.querySelector('.patient-registration-form');
 const specialtySelectionSelect = document.querySelector('#specialtySelection') as HTMLSelectElement;
 const showPatientsBtn = document.querySelector('#show-patients');
-
-
-//STATE
-let fullState:completeOutboundI[] = [];
-
-
-//INTERFACES
-export interface specialtyInboundI {
-    specialtyName:string,
-    physicianInCharge:string
-}
-
-export interface completeOutboundI {
-    specialtyId: number,
-    specialtyName: string,
-    physicianInCharge: string,
-        patientList: [{
-            patientDNI: number,
-            patientName: string,
-            age: number,
-            appointmentDates: string,
-            numberOfAppointments: number,
-            fkSpecialtyId: number
-        }]
-}
-
-export interface patientInboundI {
-    patientDNI: number,
-    patientName: string,
-    age: number,
-    fkSpecialtyId: number
-}
-
-
-export interface patientOutboundI {
-    patientId: number,
-    patientDNI: number,
-    patientName: string,
-    age: number,
-    appointmentDates: string,
-    numberOfAppointments: number
-}
-
 
 
 
@@ -103,15 +64,10 @@ function displayAppointmentRegistration(){
 
 
 
-
-
-
 function displayShowAllData(){
     mainMenu?.classList.add('display-none');
     cancelBtn?.classList.remove('display-none');
     getAllCompleteSpecialties().then(specialties => {
-        //TODO Revisar si si necesito el state porque creo que mejor estoy leyento todo dela base datos
-        fullState = specialties;
         const displayContentDiv = document.querySelector('.display-content') as HTMLDivElement;
         const div:HTMLDivElement = document.createElement('div');
         div.className = "specialties-container";
@@ -126,7 +82,6 @@ function displayShowAllData(){
 function cancelAllDisplay(){
     cancelBtn?.classList.add('display-none');
     mainMenu?.classList.remove('display-none');
-    //AGREGAR TODOS LOS COMPONENTES
     specialtyCreationform?.classList.add('display-none');
     const divAllData:HTMLDivElement | null = document.querySelector('.specialties-container');
     if(divAllData !== null){
@@ -138,6 +93,7 @@ function cancelAllDisplay(){
         divPatientData.remove();
     }
 }
+
 
 function displaySpecialtyCreation(){
         const specialtyNameInput = document.querySelector('#SpecialtyName') as HTMLInputElement;
@@ -164,6 +120,7 @@ function renderPatients(){
         displayContentDiv.append(div);
     })
 }
+
 
 
 function renderSinglePatient(patient:patientOutboundI): HTMLDivElement{
@@ -217,10 +174,8 @@ function handleAppointmentAddition(div:HTMLDivElement, receivedPatient: patientO
             let patient = specialty?.patientList.find(patient => patient.patientDNI === receivedPatient.patientDNI);
 
             if(patient === undefined){
-                //Si no está toca agregarlo a la especialidad, agregar fecha y aumentar contador.
                 putOnlyAppintmentInfo(receivedPatient.patientDNI);
             } else {
-                //Si sí está solo es agregar fecha y aumentar contador.
                 putOnlyAppintmentInfo(receivedPatient.patientDNI);
             }
 
@@ -354,15 +309,10 @@ function createSpecialtyListing(specialty:completeOutboundI): HTMLDivElement{
         appointmentDatesh4.innerText = 'Appointment Dates: ' + patient.appointmentDates;
         const numberOfAppointmentsh4:HTMLElement = document.createElement('h4');
         numberOfAppointmentsh4.innerText = 'Number of Appointments: ' +  patient.numberOfAppointments;
-        // const fkSpecialtyIdh4:HTMLElement = document.createElement('h4');
-        // fkSpecialtyIdh4.innerText = 'Specialty ID: ' + patient.fkSpecialtyId;
-        // fkSpecialtyIdh4
-
         singlePatientDiv.append(patientDNIh4, patientNameh4, ageh4, appointmentDatesh4, numberOfAppointmentsh4);
 
         div.append(singlePatientDiv);
 
-    
     })
 
     return div;
@@ -438,7 +388,6 @@ function handleSpecialtyDelete(div:HTMLDivElement){
                      
     })
 
-    
 }
 
 

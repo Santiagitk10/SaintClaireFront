@@ -1,5 +1,5 @@
-import {specialtyInboundI, completeOutboundI, patientInboundI, patientOutboundI} from "../index.js"
-
+// import {specialtyInboundI, completeOutboundI, patientInboundI, patientOutboundI} from "../index.js"
+import {specialtyInboundI, completeOutboundI, patientInboundI, patientOutboundI} from "../interfaces/interfaces.js"
 
 export async function getAllCompleteSpecialties(){
   const response:Response = await fetch('http://localhost:8080/api/saintclaire/get/all/specialties');
